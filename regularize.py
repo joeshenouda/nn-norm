@@ -39,7 +39,7 @@ def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_n
     thr_max=0.0001
     idx_act_neurons = pns[0] > thr_max * max_pn
     out_sparse_perc = out_sparsity(model, idx_act_neurons)
-    result_dict['act']['out_sparse'] = out_sparse_perc
+    result_dict['act']['out_sparse'] .append(out_sparse_perc)
 
     wandb_dict = dict({
         "train_acc": train_acc,
