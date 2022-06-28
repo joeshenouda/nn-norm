@@ -75,7 +75,7 @@ class MNIST_subset:
         self.input_dim = 28
         self.num_classes = 10
         self.input_channel = 1
-        self.per_class_num = args.samps_class_num
+        self.per_class_num = args.samps_per_class
         label_include = 10
         # in total per_class_num * label_include number of samples
 

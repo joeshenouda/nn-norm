@@ -9,7 +9,7 @@ global args
 
 class ArgsHelper:
     def parse_arguments(self, jupyter_mode=False):
-        parser = argparse.ArgumentParser(description="Pruning random networks")
+        parser = argparse.ArgumentParser(description="Neural Network Norms")
 
         # ============================================================================================================ #
         # system related

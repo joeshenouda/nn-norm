@@ -153,7 +153,8 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
         start_iter = checkpoint['iter']
         last_loss = checkpoint['loss']
         idx_iter += start_iter+1
-    
+        total_iter += idx_iter
+    #import ipdb; ipdb.set_trace()
     # begin training
     for idx_epoch in tqdm.tqdm(range(start_epoch, start_epoch+total_epoch)):
         if flag_iter:  # has reached the total number of iterations
@@ -169,7 +170,9 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
 
                 # make labels one-hot if using MSELoss
                 if args.criterion.lower() == 'mse':
-                    one_hot_targets = torch.zeros(10,2)
+                    bs = targets.shape[0]
+                    out_dim = output.shape[1]
+                    one_hot_targets = torch.zeros(bs,out_dim)
                     for i, targ in enumerate(one_hot_targets):
                         targ[targets[i]] = 1
                     targets = one_hot_targets.to(device)
@@ -190,6 +193,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                         model, _ = prune_or_regularize(model, actual_thr, algo, v_norm_deg)
                 elif flag_layerwise_balance:
                     model = layerwise_balance(model, algo, w_norm_deg, v_norm_deg)
+                
 
                 # Frequency for Testing
                 if idx_iter % log_freq == 0:

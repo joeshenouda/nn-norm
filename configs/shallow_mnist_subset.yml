@@ -2,13 +2,13 @@
 cuda: True
 gpu: ??
 logger_name: ??
-seed: 42
+seed: 44
 
 # data related
 data_path: data/
-batch_size: 100
+batch_size: 10
 which_dataset: MNIST_subset
-samps_per_class: 50
+samps_per_class: 10
 
 # optimizer
 optimizer: SGD  # AdamW
@@ -19,15 +19,15 @@ criterion: "MSE"
 
 # model related
 arch: shallow_NN
-num_hidden: 250
+num_hidden: 5000
 
 # training related
-total_iter: 5000
-iter_period: 5000
+total_iter: 10003
+iter_period: 10003
 prune_iter: 0
-debias_iter: 5000
+debias_iter: 10003
 log_freq: 5
-save_freq: 500
+save_freq: 100
 
 
 # hyper parameter
