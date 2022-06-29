@@ -157,6 +157,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
     #import ipdb; ipdb.set_trace()
     # begin training
     for idx_epoch in tqdm.tqdm(range(start_epoch, start_epoch+total_epoch)):
+        #import ipdb; ipdb.set_trace()
         if flag_iter:  # has reached the total number of iterations
             break
         else:
@@ -193,7 +194,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                         model, _ = prune_or_regularize(model, actual_thr, algo, v_norm_deg)
                 elif flag_layerwise_balance:
                     model = layerwise_balance(model, algo, w_norm_deg, v_norm_deg)
-                
+                print("Idx Iter: {}, Train Loss: {:.5f}".format(idx_iter,train_loss.item()))
 
                 # Frequency for Testing
                 if idx_iter % log_freq == 0:
@@ -204,7 +205,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                     PATH_result = os.path.join(dest_dir, "result.pt")
                     torch.save(result_dict, PATH_result)
                     wandb_log(wandb, wandb_dict, model, idx_iter, idx_epoch, train_loss, optimizer)
-
+                    logger.info("Iter: {}, Loss: {:.5f}".format(idx_iter, train_loss.item()))
                 if idx_iter % save_freq == 0:
                     PATH_model = os.path.join(dest_dir, "model_idx_{}_acc_{}_sp_{}".format(
                         idx_iter, round(wandb_dict['test_acc'], 2), int(wandb_dict['nact'])).replace(".", "_") + ".pt")

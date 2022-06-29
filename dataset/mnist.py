@@ -88,7 +88,16 @@ class MNIST_subset:
         # permute
         train_data = train_set.__dict__['data']
         train_targets = train_set.__dict__['targets']
-        idx_rand = torch.randperm(60000)
+        
+        if args.load_pretrained_model:
+            PATH_indx = os.path.join(args.results_dir, 'train_idxs.pt')
+            idx_rand = torch.load(PATH_indx) if os.path.isfile(PATH_indx) else torch.randperm(60000)
+            torch.save(idx_rand, PATH_indx)
+        else:
+            idx_rand = torch.randperm(60000)
+            PATH_indx = os.path.join(args.dest_dir, "train_idxs.pt")
+            torch.save(idx_rand, PATH_indx)
+        
         train_data = train_data[idx_rand]
         train_targets = train_targets[idx_rand]
         train_set.__dict__['data'] = train_data

@@ -31,11 +31,9 @@ def setup_logger(name, args):
         dest_dir = args.dest_dir
         handler = logging.FileHandler('{}/{}_{}.log'.format(dest_dir, now, name), mode='w')
     handler.setFormatter(formatter)
-    screen_handler = logging.StreamHandler(stream=sys.stdout)
-    screen_handler.setFormatter(formatter)
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
-    logger.addHandler(screen_handler)
     logger.addHandler(TqdmLoggingHandler())
+    logger.propagate = False
     return logger

@@ -1,12 +1,13 @@
 import argparse
 import yaml
 import sys
+import traceback
 
 from configs import parser as _parser
 
 global args
-
-
+#print(sys.modules)
+#traceback.print_stack()
 class ArgsHelper:
     def parse_arguments(self, jupyter_mode=False):
         parser = argparse.ArgumentParser(description="Neural Network Norms")
@@ -16,8 +17,16 @@ class ArgsHelper:
         parser.add_argument(
             "--cuda",
             action="store_true",
-            required=True,
+            required=False,
+            default=False,
             help="[system] bool value to use gpu or not"
+        )
+        parser.add_argument(
+            "--no-cuda",
+            action="store_true",
+            required=False,
+            default=False,
+            help="[system] bool value to use no cuda or not"
         )
         parser.add_argument(
             "--gpu",
@@ -422,6 +431,7 @@ class ArgsHelper:
             if not jupyter_mode:
                 for v in override_args:
                     loaded_yaml[v] = getattr(parser_args, v)
+            #import ipdb; ipdb.set_trace()
 
             print(f"=> Reading YAML config from {parser_args.config}")
             parser_args.__dict__.update(loaded_yaml)

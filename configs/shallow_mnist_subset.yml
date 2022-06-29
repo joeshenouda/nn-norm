@@ -1,5 +1,6 @@
 # system related
 cuda: True
+no_cuda: ??
 gpu: ??
 logger_name: ??
 seed: 44

@@ -10,7 +10,6 @@ import os
 
 eps = 1e-8
 
-
 def log_message(logger, message):
     if logger is None:
         print(message)
@@ -205,6 +204,7 @@ def set_dest_dir(args):
         dest_dir = args.results_dir
     else:
         dest_dir = os.path.join(subfolder_path, "{}_{}".format(now, args.logger_name))
+    #import ipdb; ipdb.set_trace()
     os.makedirs(dest_dir, exist_ok=True)
     args.dest_dir = dest_dir
 
