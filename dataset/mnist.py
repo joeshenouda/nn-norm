@@ -325,7 +325,6 @@ class MNIST_binary_synth:
         train_set = mySynthMNISTDataset(updated_train_data_tens, rand_labels, transform=transform)
         
         PATH_train_set = os.path.join(args.dest_dir, 'training_set.pt')
-        import ipdb; ipdb.set_trace()
         torch.save(train_set, PATH_train_set)
 
         val_set.__dict__['targets'] = updated_val_targets
