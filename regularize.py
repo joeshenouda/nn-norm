@@ -10,18 +10,19 @@ from main_utils import test, calc_and_print_nonzeros_neuron, calc_and_print_nonz
 from prune_algo import prune_or_regularize, layerwise_balance, normalize_w, collect_other_l2_norm, collect_grouped_norm
 
 
-def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_norm_deg, logger):
+def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_deg, v_norm_deg, logger):
     # dataset
     train_loader = dataset.train_loader
     val_loader = dataset.val_loader
     test_loader = dataset.test_loader
 
-    test_acc = test(model, test_loader, device)
-    result_dict['acc']['test'].append(test_acc)
-    val_acc = test(model, val_loader, device)
-    result_dict['acc']['val'].append(val_acc)
-    train_acc = test(model, train_loader, device)
-    result_dict['acc']['train'].append(train_acc)
+    if args.which_dataset.lower() != "mnist_binary_synth":
+        test_acc = test(model, test_loader, device)
+        result_dict['acc']['test'].append(test_acc)
+        val_acc = test(model, val_loader, device)
+        result_dict['acc']['val'].append(val_acc)
+        train_acc = test(model, train_loader, device)
+        result_dict['acc']['train'].append(train_acc)
 
     # gradient norm
     #gradient_norm_max = get_gradient_norm(model, device, criterion, val_loader)
@@ -215,7 +216,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                 # Frequency for Testing
                 if idx_iter % log_freq == 0:
                     result_dict, wandb_dict = test_and_log(
-                        model, dataset, criterion, device, result_dict, w_norm_deg, v_norm_deg, logger)
+                        model, args, dataset, criterion, device, result_dict, w_norm_deg, v_norm_deg, logger)
                     result_dict['loss']['loss'].append(train_loss.item())
 
                     PATH_result = os.path.join(dest_dir, "result.pt")
