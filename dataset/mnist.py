@@ -25,12 +25,11 @@ class myMNISTDataset(Dataset):
         return sample, label
 
 class mySynthMNISTDataset(Dataset):
-    def __init__(self, tensor_data, transform=None):
+    def __init__(self, tensor_data, rand_labels, transform=None):
         self.data = tensor_data
         tot_samps = self.data.shape[0]
         self.transform=transform
-        self.labels = torch.load('data/2D_gaussian_labels.pt')[:tot_samps]
-
+        self.labels = rand_labels
     def __len__(self):
         return self.data.shape[0]
 
@@ -318,10 +317,17 @@ class MNIST_binary_synth:
                 updated_val_data.append(sample_i)
                 updated_val_targets.append(target_i)
 
+        tot_samps = len(updated_train_data)    
+        rand_labels = torch.load('data/2D_gaussian_labels.pt')[:tot_samps]
+
         upd_train_data_unsq = [torch.unsqueeze(a,0) for a in updated_train_data]
         updated_train_data_tens = torch.cat(upd_train_data_unsq)
-        train_set = mySynthMNISTDataset(updated_train_data_tens, transform=transform)
+        train_set = mySynthMNISTDataset(updated_train_data_tens, rand_labels, transform=transform)
         
+        PATH_train_set = os.path.join(args.dest_dir, 'training_set.pt')
+        import ipdb; ipdb.set_trace()
+        torch.save(train_set, PATH_train_set)
+
         val_set.__dict__['targets'] = updated_val_targets
         val_set.__dict__['data'] = updated_val_data
 
