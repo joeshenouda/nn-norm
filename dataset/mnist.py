@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 from torchvision import datasets, transforms
 from torch.utils.data import Dataset
+import torch.nn.functional as F
 
 
 class myMNISTDataset(Dataset):
@@ -24,15 +25,22 @@ class myMNISTDataset(Dataset):
         return sample, label
 
 class mySynthMNISTDataset(Dataset):
-    def __init__(self, tensor_data):
+    def __init__(self, tensor_data, transform=None):
         self.data = tensor_data
         tot_samps = self.data.shape[0]
+        self.transform=transform
         self.labels = torch.load('data/2D_gaussian_labels.pt')[:tot_samps]
+
     def __len__(self):
         return self.data.shape[0]
+
     def __getitem__(self, idx):
         sample = self.data[idx]
+        sample = Image.fromarray(sample.type(torch.uint8).numpy(), mode="L")
         label = self.labels[idx]
+
+        if self.transform is not None:
+            sample = self.transform(sample)
 
         return sample, label
 
@@ -309,11 +317,10 @@ class MNIST_binary_synth:
             else:
                 updated_val_data.append(sample_i)
                 updated_val_targets.append(target_i)
-        #import ipdb; ipdb.set_trace()
-        
+
         upd_train_data_unsq = [torch.unsqueeze(a,0) for a in updated_train_data]
         updated_train_data_tens = torch.cat(upd_train_data_unsq)
-        train_set = mySynthMNISTDataset(updated_train_data_tens)
+        train_set = mySynthMNISTDataset(updated_train_data_tens, transform=transform)
         
         val_set.__dict__['targets'] = updated_val_targets
         val_set.__dict__['data'] = updated_val_data
