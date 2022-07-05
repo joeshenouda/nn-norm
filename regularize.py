@@ -16,7 +16,11 @@ def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_de
     val_loader = dataset.val_loader
     test_loader = dataset.test_loader
 
-    if args.which_dataset.lower() != "mnist_binary_synth":
+    if args.which_dataset.lower() == "mnist_binary_synth":
+        test_acc = 0
+        val_acc = 0
+        train_acc = 0
+    else:
         test_acc = test(model, test_loader, device)
         result_dict['acc']['test'].append(test_acc)
         val_acc = test(model, val_loader, device)
