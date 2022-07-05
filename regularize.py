@@ -6,7 +6,7 @@ import tqdm
 import time
 import os
 
-from main_utils import test, calc_and_print_nonzeros_neuron, calc_and_print_nonzeros_weight, get_gradient_norm, out_sparsity
+from main_utils import test, calc_and_print_nonzeros_neuron, calc_and_print_nonzeros_weight, get_gradient_norm, out_sparsity, get_out_weights
 from prune_algo import prune_or_regularize, layerwise_balance, normalize_w, collect_other_l2_norm, collect_grouped_norm
 
 
@@ -27,7 +27,7 @@ def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_n
     #gradient_norm_max = get_gradient_norm(model, device, criterion, val_loader)
 
     # calculate sparsity
-    nsp, total_pn, pns, nacts, totals, _ = calc_and_print_nonzeros_neuron(model, w_norm_deg, v_norm_deg, logger)
+    nsp, total_pn, pns, nacts, totals, _ = calc_and_print_nonzeros_neuron(model, w_norm_deg, v_norm_deg, logger, thr_max=0)
     result_dict['act']['nact'].append(nacts)
     result_dict['act']['nact_total'].append(totals)
     result_dict['act']['pns'].append(pns)
@@ -36,7 +36,8 @@ def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_n
     result_dict['act']['wact_total'].append(totals)
     
     max_pn = torch.max(pns[0])
-    thr_max=0.0001
+    #thr_max=0.0001
+    thr_max = 0
     idx_act_neurons = pns[0] > thr_max * max_pn
     out_sparse_perc = out_sparsity(model, idx_act_neurons)
     result_dict['act']['out_sparse'] .append(out_sparse_perc)
@@ -46,6 +47,7 @@ def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_n
         "val_acc": val_acc,
         "test_acc": test_acc,
         "wact": wsp,
+        "pn_list" : pns,
         "nact": nacts[0],
         "l2_norm": l2_norm,
         #"grad_norm_max": gradient_norm_max,
@@ -54,9 +56,9 @@ def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_n
     })
 
     for idx, item in enumerate(pns):
-        wandb_dict["path_norm_{}".format(idx + 1)] = item.mean().item()
-        wandb_dict["path_norm_min_{}".format(idx + 1)] = torch.min(item[torch.nonzero(item)])
-        wandb_dict["path_norm_max_{}".format(idx + 1)] = torch.max(item[torch.nonzero(item)])
+        wandb_dict["mean_path_norm_group_{}".format(idx + 1)] = item.mean().item()
+        wandb_dict["path_norm_min_group_{}".format(idx + 1)] = torch.min(item[torch.nonzero(item)])
+        wandb_dict["path_norm_max_group_{}".format(idx + 1)] = torch.max(item[torch.nonzero(item)])
 
     result_dict['loss']['L2_norm'].append(l2_norm)
     _, total_pn, _, _, _, _ = calc_and_print_nonzeros_neuron(model, 2, 2, logger)
@@ -70,9 +72,20 @@ def test_and_log(model, dataset, criterion, device, result_dict, w_norm_deg, v_n
     return result_dict, wandb_dict
 
 
-def wandb_log(wandb, wandb_dict, model, idx_iter, epoch, train_loss, optimizer):
+def wandb_log(wandb, wandb_dict, args, model, idx_iter, epoch, train_loss, optimizer):
     wandb_dict['idx_iter'] = idx_iter
     wandb_dict['train_loss'] = train_loss
+
+    for idx, group_pn in enumerate(wandb_dict['pn_list']):
+        pn_data = [[pn.item()] for pn in group_pn]
+        pn_table = wandb.Table(data = pn_data, columns = ["Path Norms Group {}".format(idx+1)])
+        wandb_dict["path_norm_hist_group_{}".format(idx+1)] = wandb.plot.histogram(pn_table, "Path Norms Group {}".format(idx+1), title="Distribution of Path Norms")
+
+        out_weights = get_out_weights(model, group_pn)
+        out_weights_list = out_weights.cpu().numpy().tolist()
+        #import ipdb; ipdb.set_trace()
+        out_weight_table = wandb.Table(data = out_weights_list, columns=["v{}".format(i) for i in range(out_weights.shape[1])])
+        wandb_dict["out_weights_table"] = out_weight_table
 
     w_norm_max, v_norm_max, w_norm_min, v_norm_min = -1, -1, 100, 100
     for grouped_layer in model.grouped_layers:
@@ -170,12 +183,15 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                 output = model(imgs)
 
                 # make labels one-hot if using MSELoss
-                if args.criterion.lower() == 'mse':
+                if args.criterion.lower() == 'mse' and args.which_dataset.lower() == 'mnist_binary':
                     bs = targets.shape[0]
                     out_dim = output.shape[1]
                     one_hot_targets = torch.zeros(bs,out_dim)
                     for i, targ in enumerate(one_hot_targets):
-                        targ[targets[i]] = 1
+                        if args.flip_one_hot:
+                            targ[1-targets[i]] = 1
+                        else:
+                            targ[targets[i]] = 1
                     targets = one_hot_targets.to(device)
                 
                 train_loss = criterion(output, targets)
@@ -204,7 +220,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
 
                     PATH_result = os.path.join(dest_dir, "result.pt")
                     torch.save(result_dict, PATH_result)
-                    wandb_log(wandb, wandb_dict, model, idx_iter, idx_epoch, train_loss, optimizer)
+                    wandb_log(wandb, wandb_dict, args, model, idx_iter, idx_epoch, train_loss, optimizer)
                     logger.info("Iter: {}, Loss: {:.5f}".format(idx_iter, train_loss.item()))
                 if idx_iter % save_freq == 0:
                     PATH_model = os.path.join(dest_dir, "model_idx_{}_acc_{}_sp_{}".format(

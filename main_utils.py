@@ -351,4 +351,9 @@ def out_sparsity(model, active_neurons):
     spars_perc = torch.sum(sparsity) / len(sparsity)
     return spars_perc
 
+def get_out_weights(model, pns):    
+    net_out_weights = model.linear2.weight.detach()
+    act_neurons = pns > 0
+    return net_out_weights.T[act_neurons]
+
 

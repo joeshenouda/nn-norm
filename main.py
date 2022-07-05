@@ -50,7 +50,7 @@ def main():
     criterion = get_criterion(criterion_type=args.criterion)
     optimizer = get_optimizer(args=args, model=model)
     scheduler = get_scheduler(optimizer=optimizer, logger=logger, args=args)
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
 
     if args.regularize:
         _, _ = regularize_trainer(

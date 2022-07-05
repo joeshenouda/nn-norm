@@ -8,7 +8,7 @@ seed: 42
 data_path: data/
 batch_size: 10
 samps_per_class: 50
-which_dataset: MNIST_binary
+which_dataset: MNIST_binary_synth
 
 # optimizer
 optimizer: SGD  # AdamW

@@ -23,12 +23,12 @@ arch: shallow_NN
 num_hidden: 5000
 
 # training related
-total_iter: 10003
-iter_period: 10003
+total_iter: 40003
+iter_period: 40003
 prune_iter: 0
-debias_iter: 10003
-log_freq: 5
-save_freq: 100
+debias_iter: 40003
+log_freq: 10
+save_freq: 200
 
 
 # hyper parameter

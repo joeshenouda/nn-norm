@@ -104,6 +104,20 @@ class ArgsHelper:
             default=700,
             help="[dataset] dimensions for random dataset"
         )
+        parser.add_argument(
+            "--flip-one-hot",
+            action="store_true",
+            required=False,
+            default=False,
+            help="[data] For binary experiments this will flip the one-hot encoding of labels"
+        )
+        parser.add_argument(
+            "--synth-labels",
+            action="store_true",
+            required=False,
+            default=False,
+            help="[dataset] use synthetic labels for binary MNIST"
+        )
         # augmentation
         parser.add_argument(
             '--smoothing',
