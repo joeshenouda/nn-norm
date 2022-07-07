@@ -1,0 +1,35 @@
+# system related
+cuda: True
+no_cuda: ??
+gpu: ??
+logger_name: ??
+seed: 44
+
+# data related
+data_path: data/
+batch_size: 10
+which_dataset: MNIST_subset_synth
+samps_per_class: 10
+
+# optimizer
+optimizer: SGD  # AdamW
+lr: ??  # 0.0001
+wd: 0.
+momentum: 0.
+criterion: "MSE"
+
+# model related
+arch: shallow_NN
+num_hidden: 1000
+
+# training related
+total_iter: 40003
+iter_period: 40003
+prune_iter: 0
+debias_iter: 40003
+log_freq: 10
+save_freq: 2000
+
+
+# hyper parameter
+#threshold: 0.001

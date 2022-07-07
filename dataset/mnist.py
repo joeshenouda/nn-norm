@@ -166,6 +166,97 @@ class MNIST_subset:
         self.test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=batch_size, shuffle=False, drop_last=False, **kwargs)
 
+class MNIST_subset_synth:
+    def __init__(self, args):
+        """
+        use args: num_workers, cuda, data_path, batch_size
+        """
+        super(MNIST_subset_synth, self).__init__()
+
+        # use args:
+        use_cuda = args.cuda
+        num_workers = args.num_workers
+        path = args.data_path
+        batch_size = args.batch_size
+        label_corruption = args.label_corruption  # float in [0, 1]
+
+        # basic information
+        self.input_dim = 28
+        self.num_classes = 10
+        self.input_channel = 1
+        self.per_class_num = args.samps_per_class
+        label_include = 10
+        # in total per_class_num * label_include number of samples
+
+        # Data loading code
+        kwargs = {"num_workers": num_workers, "pin_memory": True} if use_cuda else {}
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+        train_set = datasets.MNIST(path, train=True, download=True, transform=transform)
+        val_set = datasets.MNIST(path, train=True, download=True, transform=transform)
+
+        # permute
+        train_data = train_set.__dict__['data']
+        train_targets = train_set.__dict__['targets']
+        
+        if args.load_pretrained_model:
+            PATH_indx = os.path.join(args.results_dir, 'train_idxs.pt')
+            idx_rand = torch.load(PATH_indx) if os.path.isfile(PATH_indx) else torch.randperm(60000)
+            torch.save(idx_rand, PATH_indx)
+        else:
+            idx_rand = torch.randperm(60000)
+            PATH_indx = os.path.join(args.dest_dir, "train_idxs.pt")
+            torch.save(idx_rand, PATH_indx)
+        
+        train_data = train_data[idx_rand]
+        train_targets = train_targets[idx_rand]
+        train_set.__dict__['data'] = train_data
+        train_set.__dict__['targets'] = train_targets
+
+        updated_train_data, updated_train_targets = [], []
+        updated_val_data, updated_val_targets = [], []  # val set are those samples that are not included in the train
+        count = torch.zeros(label_include)
+        for i in range(60000):
+            target_i = train_set.__dict__['targets'][i].item()
+            sample_i = train_set.__dict__['data'][i]
+            if target_i in torch.arange(label_include).tolist() and count[target_i] < self.per_class_num:
+                updated_train_data.append(sample_i)
+                updated_train_targets.append(target_i)
+                count[target_i] += 1
+            else:
+                updated_val_data.append(sample_i)
+                updated_val_targets.append(target_i)
+
+        tot_samps = len(updated_train_data)    
+        rand_labels = torch.load('data/2D_gaussian_labels_D_10.pt')[:tot_samps]
+
+        upd_train_data_unsq = [torch.unsqueeze(a,0) for a in updated_train_data]
+        updated_train_data_tens = torch.cat(upd_train_data_unsq)
+        train_set = mySynthMNISTDataset(updated_train_data_tens, rand_labels, transform=transform)
+
+        val_set.__dict__['targets'] = updated_val_targets
+        val_set.__dict__['data'] = updated_val_data
+
+        test_set = datasets.MNIST(path, train=False, transform=transform)
+
+        updated_test_data = []
+        updated_test_targets = []
+        for i in range(10000):
+            target_i = test_set.__dict__['targets'][i].item()
+            if target_i in torch.arange(label_include).tolist():
+                sample_i = test_set.__dict__['data'][i]
+                updated_test_data.append(sample_i)
+                updated_test_targets.append(target_i)
+
+        # test_set = my_dataset(updated_test_data, updated_test_targets)
+        test_set.__dict__['targets'] = updated_test_targets
+        test_set.__dict__['data'] = updated_test_data
+
+        self.train_loader = torch.utils.data.DataLoader(
+            train_set, batch_size=batch_size, shuffle=True, drop_last=False, **kwargs)
+        self.val_loader = torch.utils.data.DataLoader(
+            val_set, batch_size=batch_size, shuffle=False, drop_last=False, **kwargs)
+        self.test_loader = torch.utils.data.DataLoader(
+            test_set, batch_size=batch_size, shuffle=False, drop_last=False, **kwargs)
 
 
 class MNIST_binary:

@@ -16,7 +16,7 @@ def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_de
     val_loader = dataset.val_loader
     test_loader = dataset.test_loader
 
-    if args.which_dataset.lower() == "mnist_binary_synth":
+    if args.which_dataset.lower() == "mnist_binary_synth" or args.which_dataset.lower() == "mnist_subset_synth":
         test_acc = 0
         val_acc = 0
         train_acc = 0
