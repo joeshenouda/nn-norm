@@ -19,7 +19,7 @@ criterion: "MSE"
 
 # model related
 arch: shallow_NN
-num_hidden: 250
+num_hidden: 1000
 
 # training related
 total_iter: 10000
