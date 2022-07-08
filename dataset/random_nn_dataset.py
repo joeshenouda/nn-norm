@@ -67,7 +67,7 @@ class RNNL:
         net.eval()
         Y = net(X)
 
-        train_set = myRNNLDataset(X, Y)
+        train_set = myRNNLDataset(X, Y.detach())
         PATH_train_set = os.path.join(args.dest_dir, 'training_set.pt')
         torch.save(train_set, PATH_train_set)
 
