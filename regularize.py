@@ -11,12 +11,13 @@ from prune_algo import prune_or_regularize, layerwise_balance, normalize_w, coll
 
 
 def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_deg, v_norm_deg, logger):
-    # dataset
-    train_loader = dataset.train_loader
-    val_loader = dataset.val_loader
-    test_loader = dataset.test_loader
+    if args.which_dataset.lower() != "rnnl":
+        # dataset
+        train_loader = dataset.train_loader
+        val_loader = dataset.val_loader
+        test_loader = dataset.test_loader
 
-    if args.which_dataset.lower() == "mnist_binary_synth" or args.which_dataset.lower() == "mnist_subset_synth":
+    if args.which_dataset.lower() == "rnnl" or args.which_dataset.lower() == "mnist_binary_synth" or args.which_dataset.lower() == "mnist_subset_synth":
         test_acc = 0
         val_acc = 0
         train_acc = 0

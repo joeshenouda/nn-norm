@@ -12,7 +12,10 @@ def main():
     logger = setup_logger(name=args.logger_name, args=args)
     
     if args.arch == 'shallow_NN':
-        project_name = "{}_{}_width_{}".format(args.which_dataset.lower(), args.arch.lower(), args.num_hidden)
+        if args.which_dataset.lower()=='rnnl':
+            project_name = "{}_{}_neurons_{}_width_{}".format(args.which_dataset.lower(), args.rnnl_neurons, args.arch.lower(), args.num_hidden)
+        else:
+            project_name = "{}_{}_width_{}".format(args.which_dataset.lower(), args.arch.lower(), args.num_hidden)
     else:
         project_name = "{}_{}".format(args.which_dataset.lower(),args.arch.lower())
     
@@ -25,7 +28,6 @@ def main():
         id = results_dict['wandb_id']
     wandb.init(project=project_name, entity="jshenouda", name=args.logger_name, config=vars(args), id=id, resume="allow")
     
-    #import ipdb; ipdb.set_trace()
     
     if args.load_pretrained_model:
         logger.info("Resuming Training:")
@@ -50,7 +52,6 @@ def main():
     criterion = get_criterion(criterion_type=args.criterion)
     optimizer = get_optimizer(args=args, model=model)
     scheduler = get_scheduler(optimizer=optimizer, logger=logger, args=args)
-    #import ipdb; ipdb.set_trace()
 
     if args.regularize:
         _, _ = regularize_trainer(

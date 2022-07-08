@@ -105,6 +105,30 @@ class ArgsHelper:
             help="[dataset] dimensions for random dataset"
         )
         parser.add_argument(
+            "--rnnl-samples",
+            type=int,
+            default=100,
+            help="[data] Num samples for RNNL dataset"
+        )
+        parser.add_argument(
+            "--rnnl-dim",
+            type=int,
+            default=10,
+            help="[data] Input dimension for RNNL dataset"
+        )
+        parser.add_argument(
+            "--rnnl-neurons",
+            type=int,
+            default=100,
+            help="[data] Number of neurons for RNNL dataset"
+        )
+        parser.add_argument(
+            "--rnnl-out-dim",
+            type=int,
+            default=10,
+            help="[data] Dimension for labels of RNNL dataset"
+        )
+        parser.add_argument(
             "--flip-one-hot",
             action="store_true",
             required=False,
