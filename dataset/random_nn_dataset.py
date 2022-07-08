@@ -64,8 +64,8 @@ class RNNL:
 
         # Construct shallow nn
         net = shallow_NN(int(self.input_dim**2), self.rnnl_neurons, self.num_classes)
-        shallow_NN.eval()
-        Y = shallow_NN(X)
+        net.eval()
+        Y = net(X)
 
         train_set = myRNNLDataset(X, Y)
         PATH_train_set = os.path.join(args.dest_dir, 'training_set.pt')
