@@ -63,7 +63,7 @@ class RNNL:
         X = torch.randn(self.num_samples, args.rnnl_dim)
 
         # Construct shallow nn
-        net = shallow_NN(self.input_dim**2, self.rnnl_neurons, self.num_classes)
+        net = shallow_NN(int(self.input_dim**2), self.rnnl_neurons, self.num_classes)
         shallow_NN.eval()
         Y = shallow_NN(X)
 
