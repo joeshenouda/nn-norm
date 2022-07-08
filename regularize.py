@@ -216,7 +216,6 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                         model, _ = prune_or_regularize(model, actual_thr, algo, v_norm_deg)
                 elif flag_layerwise_balance:
                     model = layerwise_balance(model, algo, w_norm_deg, v_norm_deg)
-                print("Idx Iter: {}, Train Loss: {:.5f}".format(idx_iter,train_loss.item()))
 
                 # Frequency for Testing
                 if idx_iter % log_freq == 0:
@@ -228,6 +227,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                     torch.save(result_dict, PATH_result)
                     wandb_log(wandb, wandb_dict, args, model, idx_iter, idx_epoch, train_loss, optimizer)
                     logger.info("Iter: {}, Loss: {:.5f}".format(idx_iter, train_loss.item()))
+                    logger.info("Iter: {}, Active Nerons:{}".format(result_dict['act']['nact']))
                 if idx_iter % save_freq == 0:
                     PATH_model = os.path.join(dest_dir, "model_idx_{}_acc_{}_sp_{}".format(
                         idx_iter, round(wandb_dict['test_acc'], 2), int(wandb_dict['nact'])).replace(".", "_") + ".pt")

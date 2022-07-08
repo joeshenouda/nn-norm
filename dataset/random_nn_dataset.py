@@ -60,7 +60,7 @@ class RNNL:
 
         # Generate X inputs
         torch.seed(42)
-        X = torch.randn(self.num_samples, self.dim)
+        X = torch.randn(self.num_samples, args.rnnl_dim)
 
         # Construct shallow nn
         net = shallow_NN(self.input_dim**2, self.rnnl_neurons, self.num_classes)

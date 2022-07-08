@@ -8,7 +8,7 @@ seed: 42
 data_path: data/
 batch_size: 10
 rnnl_samples: 100
-rnnl_dim: 5
+rnnl_dim: 9
 rnnl_neurons: 100
 rnnl_out_dim: 10
 which_dataset: RNNL
