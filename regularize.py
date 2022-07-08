@@ -227,7 +227,7 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
                     torch.save(result_dict, PATH_result)
                     wandb_log(wandb, wandb_dict, args, model, idx_iter, idx_epoch, train_loss, optimizer)
                     logger.info("Iter: {}, Loss: {:.5f}".format(idx_iter, train_loss.item()))
-                    logger.info("Iter: {}, Active Nerons:{}".format(idx_iter, result_dict['act']['nact']))
+                    logger.info("Iter: {}, Active Nerons:{}".format(idx_iter, result_dict['act']['nact'][-1].item()))
                 if idx_iter % save_freq == 0:
                     PATH_model = os.path.join(dest_dir, "model_idx_{}_acc_{}_sp_{}".format(
                         idx_iter, round(wandb_dict['test_acc'], 2), int(wandb_dict['nact'])).replace(".", "_") + ".pt")
