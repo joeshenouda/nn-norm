@@ -50,7 +50,7 @@ class RNNL:
         batch_size = args.batch_size
         
         # basic info
-        self.input_dim = np.sqrt(args.rnnl_dim)
+        self.input_dim = int(np.sqrt(args.rnnl_dim))
         self.input_channel = 1
         self.num_classes = args.rnnl_out_dim
         self.num_samples = args.rnnl_samples
