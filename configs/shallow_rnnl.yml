@@ -1,0 +1,37 @@
+# system related
+cuda: True
+gpu: ??
+logger_name: ??
+seed: 42
+
+# data related
+data_path: data/
+batch_size: 10
+rnnl_samples: 100
+rnnl_dim: 5
+rnnl_neurons: 100
+rnnl_out_dim: 10
+which_dataset: RNNL
+
+# optimizer
+optimizer: SGD  # AdamW
+lr: ??  # 0.0001
+wd: 0.
+momentum: 0.
+criterion: "MSE"
+
+# model related
+arch: shallow_NN
+num_hidden: 1000
+
+# training related
+total_iter: 10
+iter_period: 10
+prune_iter: 0
+debias_iter: 10
+log_freq: 1
+save_freq: 2
+
+
+# hyper parameter
+#threshold: 0.001
