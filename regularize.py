@@ -23,7 +23,6 @@ def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_de
         test_loader = dataset.test_loader
 
     if args.which_dataset.lower() == "rnnl" or args.which_dataset.lower() == "mnist_binary_synth" or args.which_dataset.lower() == "mnist_subset_synth":
-        test_acc = 0
         val_acc = 0
         train_acc = 0
     else:
