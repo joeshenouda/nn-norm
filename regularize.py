@@ -11,8 +11,13 @@ from prune_algo import prune_or_regularize, layerwise_balance, normalize_w, coll
 
 
 def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_deg, v_norm_deg, logger):
-    if args.which_dataset.lower() != "rnnl":
+    if args.which_dataset.lower() == "rnnl":
         # dataset
+        train_loader = dataset.train_loader
+        test_loader = dataset.test_loader
+        test_acc = test(model, args, criterion, test_loader, device)
+        result_dict['loss']['test'].append(test_acc)
+    else:
         train_loader = dataset.train_loader
         val_loader = dataset.val_loader
         test_loader = dataset.test_loader
@@ -22,11 +27,11 @@ def test_and_log(model, args, dataset, criterion, device, result_dict, w_norm_de
         val_acc = 0
         train_acc = 0
     else:
-        test_acc = test(model, test_loader, device)
+        test_acc = test(model, args, criterion, test_loader, device)
         result_dict['acc']['test'].append(test_acc)
-        val_acc = test(model, val_loader, device)
+        val_acc = test(model, args, criterion, val_loader, device)
         result_dict['acc']['val'].append(val_acc)
-        train_acc = test(model, train_loader, device)
+        train_acc = test(model, args, criterion, train_loader, device)
         result_dict['acc']['train'].append(train_acc)
 
     # gradient norm

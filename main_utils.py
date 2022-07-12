@@ -209,15 +209,21 @@ def set_dest_dir(args):
     args.dest_dir = dest_dir
 
 
-def test(model, test_loader, device):
+def test(model, args, criterion, test_loader, device):
     model.eval()
     correct = 0
+    loss=0
     with torch.no_grad():
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
-            correct += pred.eq(target.data.view_as(pred)).sum().item()
+            if args.criterion.lower() == "ce":
+                pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
+                correct += pred.eq(target.data.view_as(pred)).sum().item()
+            elif args.criterion.lower() == "mse":
+                loss += criterion(output, target)
+        if args.criterion.lower() == "mse":
+            return loss
         accuracy = 100. * correct / len(test_loader.dataset)
     return accuracy
 

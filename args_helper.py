@@ -105,10 +105,16 @@ class ArgsHelper:
             help="[dataset] dimensions for random dataset"
         )
         parser.add_argument(
-            "--rnnl-samples",
+            "--rnnl-train-samples",
             type=int,
             default=100,
-            help="[data] Num samples for RNNL dataset"
+            help="[data] Num training samples for RNNL dataset"
+        )
+        parser.add_argument(
+            "--rnnl-test-samps",
+            type=int,
+            default=50,
+            help="[data] Number of test samples for RNNL dataset"
         )
         parser.add_argument(
             "--rnnl-dim",
