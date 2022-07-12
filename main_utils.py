@@ -223,7 +223,7 @@ def test(model, args, criterion, test_loader, device):
             elif args.criterion.lower() == "mse":
                 loss += criterion(output, target)
         if args.criterion.lower() == "mse":
-            return loss
+            return loss.item()
         accuracy = 100. * correct / len(test_loader.dataset)
     return accuracy
 
