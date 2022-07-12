@@ -129,7 +129,7 @@ def init_result_dict(args, wandb):
         acc_dict, act_dict, loss_dict = {}, {}, {}
         acc_dict['train'], acc_dict['test'], acc_dict['val'] = [], [], []
         act_dict['nact'], act_dict['wact'], act_dict['nact_total'], act_dict['wact_total'], act_dict['pns'], act_dict['out_sparse'] = [], [], [], [], [], []
-        loss_dict['loss'], loss_dict['path_norm22'], loss_dict['path_norm21'], loss_dict['L2_norm'], loss_dict['grad_norm_max'] = [], [], [], [], []
+        loss_dict['loss'], loss_dict['test'], loss_dict['path_norm22'], loss_dict['path_norm21'], loss_dict['L2_norm'], loss_dict['grad_norm_max'] = [], [], [], [], [], []
         result_dict = {'acc': acc_dict, 'act': act_dict, 'loss': loss_dict, 'wandb_id': wandb.run.id}
     return result_dict
 
