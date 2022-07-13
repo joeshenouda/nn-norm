@@ -65,6 +65,9 @@ class RNNL:
 
         # Construct shallow nn
         net = shallow_NN(int(self.input_dim**2), self.rnnl_neurons, self.num_classes)
+        orgin_model_PATH = os.path.join(args.dest_dir, 'rnn.pt')
+        torch.save(net.state_dict(), orgin_model_PATH)
+
         net.eval()
         Y_train = net(X_train)
         Y_test = net(X_test)
@@ -83,4 +86,5 @@ class RNNL:
         self.test_loader = torch.utils.data.DataLoader(
             test_set, batch_size=batch_size, shuffle=True, drop_last=False, **kwargs
         )
+        self.rnnl_net = net
 

@@ -6,7 +6,7 @@ import tqdm
 import time
 import os
 
-from main_utils import test, calc_and_print_nonzeros_neuron, calc_and_print_nonzeros_weight, get_gradient_norm, out_sparsity, get_out_weights
+from main_utils import get_path_norm, test, calc_and_print_nonzeros_neuron, calc_and_print_nonzeros_weight, get_gradient_norm, out_sparsity, get_out_weights
 from prune_algo import prune_or_regularize, layerwise_balance, normalize_w, collect_other_l2_norm, collect_grouped_norm
 
 
@@ -120,7 +120,7 @@ def wandb_log(wandb, wandb_dict, args, model, idx_iter, epoch, train_loss, optim
         wandb.log(wandb_dict, step=epoch)
 
 
-def init_result_dict(args, wandb):
+def init_result_dict(args, dataset, wandb):
     if args.load_pretrained_model:
         PATH_results = os.path.join(args.dest_dir, "result.pt")
         result_dict = torch.load(PATH_results)
@@ -130,6 +130,12 @@ def init_result_dict(args, wandb):
         act_dict['nact'], act_dict['wact'], act_dict['nact_total'], act_dict['wact_total'], act_dict['pns'], act_dict['out_sparse'] = [], [], [], [], [], []
         loss_dict['loss'], loss_dict['test'], loss_dict['path_norm22'], loss_dict['path_norm21'], loss_dict['L2_norm'], loss_dict['grad_norm_max'] = [], [], [], [], [], []
         result_dict = {'acc': acc_dict, 'act': act_dict, 'loss': loss_dict, 'wandb_id': wandb.run.id}
+        if args.which_dataset.lower() == 'rnnl':
+            rnnl_net = dataset.rnnl_net
+            rnnl_net_path_norm21 = get_path_norm(rnnl_net.grouped_layers[0], w_norm_deg=2, v_norm_deg=1)
+            rnnl_net_path_norm22 = get_path_norm(rnnl_net.grouped_layers[0], w_norm_deg=2, v_norm_deg=2)
+            result_dict['rnnl_net_path_norm21'] = rnnl_net_path_norm21
+            result_dict['rnnl_net_path_norm22'] = rnnl_net_path_norm22
     return result_dict
 
 
@@ -160,7 +166,11 @@ def trainer(dataset, device, model, args, optimizer, scheduler, criterion, logge
 
     assert args.wd == 0, "weight decay needs to be set to zero to ensure "
     assert algo == 'v0', "Let's only work on algorithm v0 structure for now"
-    result_dict = init_result_dict(args, wandb)
+    result_dict = init_result_dict(args, dataset, wandb)
+
+    if args.which_dataset.lower() == 'rnnl':
+        print('Random NN Path Norm L2-L1: {}'.format(result_dict['rnnl_net_path_norm21']))
+        print('Random NN Path Norm L2-L2: {}'.format(result_dict['rnnl_net_path_norm22']))
 
     # start training
     idx_iter = 0
