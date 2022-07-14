@@ -45,6 +45,7 @@ def main():
     else:
         device = torch.device("cpu")
         torch.set_num_threads(4)
+    set_seed(args.seed, logger)
     logger.info("Using device {}".format(device))
     dataset = get_dataset(args=args, logger=logger)
     update_iter_and_epochs(dataset=dataset, args=args, logger=logger)
