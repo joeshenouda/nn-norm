@@ -53,15 +53,16 @@ class RNNL:
         self.input_dim = int(np.sqrt(args.rnnl_dim))
         self.input_channel = 1
         self.num_classes = args.rnnl_out_dim
-        self.num_samples = args.rnnl_samples
+        self.num_train_samples = args.rnnl_train_samples
+        self.num_test_samples = args.rnnl_test_samples
 
         self.rnnl_neurons = args.rnnl_neurons
         # Generate training set by constructing a neural network and passing random gaussian x;s into it
 
         # Generate X inputs
         #torch.seed(42)
-        X_train = torch.randn(self.num_samples, args.rnnl_dim)
-        X_test = torch.randn(self.num_samples, args.rnnl_dim)
+        X_train = torch.randn(self.num_train_samples, args.rnnl_dim)
+        X_test = torch.randn(self.num_test_samples, args.rnnl_dim)
 
         # Construct shallow nn
         net = shallow_NN(int(self.input_dim**2), self.rnnl_neurons, self.num_classes)
