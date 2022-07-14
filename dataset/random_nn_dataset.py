@@ -60,7 +60,7 @@ class RNNL:
         # Generate training set by constructing a neural network and passing random gaussian x;s into it
 
         # Generate X inputs
-        torch.seed(42)
+        torch.manual_seed(42)
         X_train = torch.randn(self.num_train_samples, args.rnnl_dim)
         X_test = torch.randn(self.num_test_samples, args.rnnl_dim)
 
